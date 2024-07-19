@@ -105,6 +105,31 @@ extension ViewController: UITableViewDelegate {
         addFriendVC.friend = friend
         self.navigationController?.pushViewController(addFriendVC, animated: true)
     }
+    
+    // 스와이프 삭제 기능 추가
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] (action, view, completionHandler) in
+            self?.deleteFriend(at: indexPath)
+            completionHandler(true)
+        }
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        return configuration
+    }
+    
+    private func deleteFriend(at indexPath: IndexPath) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        managedContext.delete(friends[indexPath.row])
+        
+        do {
+            try managedContext.save()
+            friends.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        } catch let error as NSError {
+            print("Could not save after deletion. \(error), \(error.userInfo)")
+        }
+    }
 }
 
 extension ViewController: UITableViewDataSource {
