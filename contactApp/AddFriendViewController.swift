@@ -1,7 +1,14 @@
 import UIKit
 import SnapKit
+import CoreData
 
 class AddFriendViewController: UIViewController {
+    
+    var friend: NSManagedObject? {
+        didSet {
+            configureUIForEditing()
+        }
+    }
     
     private let contactLabel: UILabel = {
         let label = UILabel()
@@ -16,6 +23,7 @@ class AddFriendViewController: UIViewController {
         button.setTitle("적용", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
         button.backgroundColor = .white
+        button.addTarget(self, action: #selector(applyButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -54,7 +62,6 @@ class AddFriendViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("ViewdidLod")
         view.backgroundColor = .white
         configureUI()
     }
@@ -76,7 +83,7 @@ class AddFriendViewController: UIViewController {
         }
         
         applyButton.snp.makeConstraints {
-            $0.leading.equalTo(contactLabel.snp.trailing).offset(20) // Adjusted for spacing
+            $0.leading.equalTo(contactLabel.snp.trailing).offset(20)
             $0.centerY.equalTo(contactLabel)
             $0.height.equalTo(100)
             $0.width.equalTo(200)
@@ -85,7 +92,7 @@ class AddFriendViewController: UIViewController {
         randomImage.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.top.equalTo(contactLabel.snp.bottom).offset(30)
-            $0.width.height.equalTo(200) // Adjust size as needed
+            $0.width.height.equalTo(200)
         }
         
         imageButton.snp.makeConstraints {
@@ -108,8 +115,26 @@ class AddFriendViewController: UIViewController {
         }
     }
     
+    private func configureUIForEditing() {
+        if let friend = friend {
+            contactLabel.isHidden = true
+            navigationItem.title = friend.value(forKey: "name") as? String
+            nameTextField.text = friend.value(forKey: "name") as? String
+            phoneTextField.text = friend.value(forKey: "phone") as? String
+            if let imageData = friend.value(forKey: "imageData") as? Data {
+                randomImage.image = UIImage(data: imageData)
+            }
+        } else {
+            contactLabel.isHidden = false
+            navigationItem.title = "연락처 추가"
+            nameTextField.text = ""
+            phoneTextField.text = ""
+            randomImage.image = nil
+        }
+    }
+    
     @objc private func fetchRandomPokemonImage() {
-        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(Int.random(in: 1...898))/") else {
+        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(Int.random(in: 1...1000))/") else {
             print("Invalid URL")
             return
         }
@@ -144,9 +169,39 @@ class AddFriendViewController: UIViewController {
             }
         }.resume()
     }
-}
-
-#Preview {
-    let rc = AddFriendViewController()
-    return rc
+    
+    @objc private func applyButtonTapped() {
+        guard let name = nameTextField.text, !name.isEmpty,
+              let phone = phoneTextField.text, !phone.isEmpty,
+              let image = randomImage.image else {
+            // Show error message
+            return
+        }
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        if let friend = friend {
+            // Update existing friend
+            friend.setValue(name, forKey: "name")
+            friend.setValue(phone, forKey: "phone")
+            friend.setValue(image.pngData(), forKey: "imageData")
+        } else {
+            // Create new friend
+            let entity = NSEntityDescription.entity(forEntityName: "Friend", in: managedContext)!
+            let newFriend = NSManagedObject(entity: entity, insertInto: managedContext)
+            newFriend.setValue(name, forKey: "name")
+            newFriend.setValue(phone, forKey: "phone")
+            newFriend.setValue(image.pngData(), forKey: "imageData")
+        }
+        
+        do {
+            try managedContext.save()
+            // Notify ViewController to reload data
+            NotificationCenter.default.post(name: NSNotification.Name("FriendAdded"), object: nil)
+            self.navigationController?.popViewController(animated: true)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
 }

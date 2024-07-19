@@ -16,7 +16,7 @@
 		C2D145172C43A02C0065B3C6 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = C2D145162C43A02C0065B3C6 /* SnapKit */; };
 		C2D1451B2C43A03C0065B3C6 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D1451A2C43A03C0065B3C6 /* TableViewCell.swift */; };
 		C2D1451D2C43A0730065B3C6 /* AddFriendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D1451C2C43A0730065B3C6 /* AddFriendViewController.swift */; };
-		C2D145492C43E0D20065B3C6 /* AddFriendDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D145482C43E0D20065B3C6 /* AddFriendDelegate.swift */; };
+		C2D145492C43E0D20065B3C6 /* UITableViewDil.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D145482C43E0D20065B3C6 /* UITableViewDil.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,7 +30,7 @@
 		C2D1450F2C439F640065B3C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2D1451A2C43A03C0065B3C6 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		C2D1451C2C43A0730065B3C6 /* AddFriendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFriendViewController.swift; sourceTree = "<group>"; };
-		C2D145482C43E0D20065B3C6 /* AddFriendDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFriendDelegate.swift; sourceTree = "<group>"; };
+		C2D145482C43E0D20065B3C6 /* UITableViewDil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewDil.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +69,7 @@
 				C2D145022C439F630065B3C6 /* ViewController.swift */,
 				C2D1451A2C43A03C0065B3C6 /* TableViewCell.swift */,
 				C2D1451C2C43A0730065B3C6 /* AddFriendViewController.swift */,
-				C2D145482C43E0D20065B3C6 /* AddFriendDelegate.swift */,
+				C2D145482C43E0D20065B3C6 /* UITableViewDil.swift */,
 				C2D1450A2C439F640065B3C6 /* Assets.xcassets */,
 				C2D1450C2C439F640065B3C6 /* LaunchScreen.storyboard */,
 				C2D1450F2C439F640065B3C6 /* Info.plist */,
@@ -157,7 +157,7 @@
 				C2D1451B2C43A03C0065B3C6 /* TableViewCell.swift in Sources */,
 				C2D1451D2C43A0730065B3C6 /* AddFriendViewController.swift in Sources */,
 				C2D145092C439F630065B3C6 /* contactApp.xcdatamodeld in Sources */,
-				C2D145492C43E0D20065B3C6 /* AddFriendDelegate.swift in Sources */,
+				C2D145492C43E0D20065B3C6 /* UITableViewDil.swift in Sources */,
 				C2D145032C439F630065B3C6 /* ViewController.swift in Sources */,
 				C2D144FF2C439F630065B3C6 /* AppDelegate.swift in Sources */,
 				C2D145012C439F630065B3C6 /* SceneDelegate.swift in Sources */,

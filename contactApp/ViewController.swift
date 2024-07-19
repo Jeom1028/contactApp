@@ -1,5 +1,6 @@
 import UIKit
 import SnapKit
+import CoreData
 
 class ViewController: UIViewController {
     
@@ -15,7 +16,7 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.setTitle("추가", for: .normal)
         button.setTitleColor(.gray, for: .normal)
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         button.backgroundColor = .white
         return button
     }()
@@ -29,17 +30,14 @@ class ViewController: UIViewController {
         return tableView
     }()
     
-    private let friends: [(name: String, phone: String, image: UIImage?)] = [
-        (name: "Alice", phone: "010-1111-1111", image: UIImage(named: "alice")),
-        (name: "Bob", phone: "010-2222-2222", image: UIImage(named: "bob")),
-        (name: "Charlie", phone: "010-3333-3333", image: UIImage(named: "charlie")),
-        // Add more friends as needed
-    ]
+    private var friends: [NSManagedObject] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         configureUI()
+        fetchFriends()
+        NotificationCenter.default.addObserver(self, selector: #selector(friendAdded), name: NSNotification.Name("FriendAdded"), object: nil)
     }
 
     @objc
@@ -61,15 +59,36 @@ class ViewController: UIViewController {
         }
         
         plusButton.snp.makeConstraints {
-            $0.leading.equalTo(friendLabel.snp.trailing).offset(70)
+            $0.leading.equalTo(friendLabel.snp.trailing).offset(20)
             $0.centerY.equalTo(friendLabel)
             $0.height.equalTo(100)
-            $0.width.equalTo(100)
+            $0.width.equalTo(200)
         }
         
         tableView.snp.makeConstraints {
-            $0.top.equalTo(friendLabel.snp.bottom).offset(40)
+            $0.top.equalTo(friendLabel.snp.bottom).offset(20)
             $0.left.right.bottom.equalToSuperview()
+        }
+    }
+    
+    @objc private func friendAdded() {
+        fetchFriends()
+    }
+    
+    private func fetchFriends() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Friend")
+        
+        // Add sort descriptor to fetch request
+        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        do {
+            friends = try managedContext.fetch(fetchRequest)
+            tableView.reloadData()
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
         }
     }
 }
@@ -78,6 +97,13 @@ extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let friend = friends[indexPath.row]
+        let addFriendVC = AddFriendViewController()
+        addFriendVC.friend = friend
+        self.navigationController?.pushViewController(addFriendVC, animated: true)
     }
 }
 
@@ -91,8 +117,14 @@ extension ViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCell.id, for: indexPath) as? TableViewCell else {
             return UITableViewCell()
         }
+        
         let friend = friends[indexPath.row]
-        cell.configure(name: friend.name, phone: friend.phone, image: friend.image)
+        let name = friend.value(forKey: "name") as? String
+        let phone = friend.value(forKey: "phone") as? String
+        let imageData = friend.value(forKey: "imageData") as? Data
+        let image = imageData != nil ? UIImage(data: imageData!) : nil
+        
+        cell.configure(name: name ?? "", phone: phone ?? "", image: image)
         return cell
     }
 }
